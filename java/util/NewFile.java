@@ -8,30 +8,17 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class NewFile {
-
-    public enum Command {
-        Class,
-        Main,
-        Print
-    }
-
     private static String myFile = "";
     private static String name = "";
-    private static String javaFile = "";
-    private static String javaName;
-    private static String nameNoExtension;
 
     public static ArrayList<Var> varList = new ArrayList<>();
 
     public NewFile(String name) {
         NewFile.name = name;
-        javaFile = "";
     }
 
     public void readFile() {
-        nameNoExtension = name.split("\\.")[0];
         name = "C:\\Users\\nolan\\Desktop\\Coding\\Java\\language\\src\\" + name;
-        javaName = "C:\\Users\\nolan\\Desktop\\Coding\\Java\\language\\java\\out\\" + nameNoExtension + ".java";
 
         try {
             File myObj = new File(name);
@@ -48,13 +35,25 @@ public class NewFile {
     }
 
     public void writeCommands() {
-        String[] file = Arrays.stream(myFile.toLowerCase().split("")).filter((String s) -> !s.equals(" ")).collect(Collectors.joining()).split("\\)");
+        String[] myFileArray = myFile.split("\"");
+        ArrayList<String> files = new ArrayList<>();
+
+        for (int i = 0; i < myFileArray.length; i++) {
+            if (i % 2 == 0) {
+                files.add(Arrays.stream(myFileArray[i].toLowerCase().split("")).filter((String s) -> !s.equals(" ")).collect(Collectors.joining()));
+            } else {
+                files.add(myFileArray[i]);
+            }
+        }
+        String[] file = String.join("", files).split("\\)");
+
+        varList.clear();
         for (String s : file) {
             Lexer lexer = new Lexer(s);
         }
     }
 
-    public static void createVar(String[] params) {
-        varList.add(new Var(params[0], params[1]));
+    public static void createVar(String id, String param) {
+        varList.add(new Var(id, param));
     }
 }
