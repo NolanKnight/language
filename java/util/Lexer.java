@@ -25,50 +25,67 @@ public class Lexer {
 
                 String[] math = params[i].split("");
                 String op = "";
-                boolean decimal = false;
-                boolean string = false;
+                boolean num = true;
+                boolean isOp = false;
 
                 for (int j = 0; j < math.length; j++) {
                     switch (math[j]) {
-                        case "\\*" -> {
+                        case "*" -> {
                             math = String.join("", math).split("\\*");
                             op = "*";
+                            isOp = true;
                         }
                         case "/" -> {
                             math = String.join("", math).split("/");
                             op = "/";
+                            isOp = true;
                         }
                         case "+" -> {
                             math = String.join("", math).split("\\+");
                             op = "+";
+                            isOp = true;
                         }
                         case "-" -> {
                             math = String.join("", math).split("-");
                             op = "-";
+                            isOp = true;
                         }
-                        case "\\." -> decimal = true;
-                        case "\"" -> string = true;
                     }
                 }
 
-                if (decimal) {
-                    switch (op) {
-                        case "+" -> params[i] = String.valueOf((Double.parseDouble(math[0]) + Double.parseDouble(math[1])));
-                        case "-" -> params[i] = String.valueOf((Double.parseDouble(math[0]) - Double.parseDouble(math[1])));
-                        case "*" -> params[i] = String.valueOf((Double.parseDouble(math[0]) * Double.parseDouble(math[1])));
-                        case "/" -> params[i] = String.valueOf((Double.parseDouble(math[0]) / Double.parseDouble(math[1])));
-                        default -> {
+                for (Var var : NewFile.varList) {
+                    for (int j = 0; j < math.length; j++) {
+                        if (var.name.equals(math[j])) {
+                            math[j] = var.val;
                         }
                     }
-                } else if (string) {
-                    params[i] = math[0] + math[1];
-                } else {
-                    switch (op) {
-                        case "+" -> params[i] = String.valueOf((Integer.parseInt(math[0]) + Integer.parseInt(math[1])));
-                        case "-" -> params[i] = String.valueOf((Integer.parseInt(math[0]) - Integer.parseInt(math[1])));
-                        case "*" -> params[i] = String.valueOf((Integer.parseInt(math[0]) * Integer.parseInt(math[1])));
-                        case "/" -> params[i] = String.valueOf((Integer.parseInt(math[0]) / Integer.parseInt(math[1])));
-                        default -> {
+                }
+
+                if (isOp) {
+                    for (String s : math[0].split("")) {
+                        if (Character.isLetter(s.charAt(0))) {
+                            num = false;
+                        }
+                    }
+
+                    double num1 = 0.0;
+                    double num2 = 0.0;
+
+                    if (num) {
+                        num1 = Double.parseDouble(math[0]);
+                        num2 = Double.parseDouble(math[1]);
+                        switch (op) {
+                            case "+" -> params[i] = String.valueOf(num1 + num2);
+                            case "-" -> params[i] = String.valueOf(num1 - num2);
+                            case "*" -> params[i] = String.valueOf(num1 * num2);
+                            case "/" -> params[i] = String.valueOf(num1 / num2);
+                            default -> {
+                            }
+                        }
+                    } else {
+                        params[i] = "";
+                        for (String s : math) {
+                            params[i] += s;
                         }
                     }
                 }
